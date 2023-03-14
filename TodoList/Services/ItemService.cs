@@ -11,7 +11,7 @@ namespace TodoList.Services
     {
         private readonly TodoContext _context;
         private readonly IMapper _mapper;
-        private IValidator<Item> _validator;
+        private readonly IValidator<Item> _validator;
 
         public ItemService(TodoContext context, IMapper mapper, IValidator<Item> validator)
         {

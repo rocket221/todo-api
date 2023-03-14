@@ -8,6 +8,7 @@ namespace TodoList.Validators
         public static void RegisterValidators(this IServiceCollection services)
         {
             services.AddScoped<IValidator<Item>, ItemValidator>();
+            services.AddScoped<IValidator<ItemsList>, ListValidator>();
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+using TodoList.Mappings;
 using TodoList.Services;
 using TodoList.ViewModels;
 
@@ -22,11 +24,13 @@ namespace TodoList.Controllers
         }
 
         [HttpPost()]
-        public ActionResult<ListViewModel> Create([FromBody] CreateListViewModel list)
+        public IActionResult Create([FromBody] CreateListViewModel list)
         {
-            var createdList = _service.Create(list);
-            return CreatedAtRoute("GetListById", new { listId = createdList.Id }, createdList);
-
+            var result = _service.Create(list);
+            return result.Match<IActionResult>(
+                list => CreatedAtRoute("GetListById", new { listId = list.Id }, list),
+                failed => BadRequest(failed.Errors.MapToResonse())
+                );
         }
 
         [HttpPatch("{listId}")]
