@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using TodoList.Repository;
-using System.Configuration;
-using AutoMapper;
+using TodoList.Validators;
 
 namespace TodoList
 {
@@ -26,6 +25,7 @@ namespace TodoList
 
             builder.Services.AddDbContext<TodoContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("TodoDatabase")));
             builder.Services.RegisterServices();
+            builder.Services.RegisterValidators();
             builder.Services.AddAutoMapper(typeof(Program));
 
             var app = builder.Build();

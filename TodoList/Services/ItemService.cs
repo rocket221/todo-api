@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using TodoList.ModelExtensions;
 using TodoList.Models;
 using TodoList.Repository;
@@ -10,17 +11,21 @@ namespace TodoList.Services
     {
         private readonly TodoContext _context;
         private readonly IMapper _mapper;
+        private IValidator<Item> _validator;
 
-        public ItemService(TodoContext context, IMapper mapper)
+        public ItemService(TodoContext context, IMapper mapper, IValidator<Item> validator)
         {
             _context = context;
             _mapper = mapper;
+            _validator = validator;
         }
 
         public ItemViewModel Create(CreateItemViewModel viewModel)
         {
             var item = _mapper.Map<Item>(viewModel);
             item.SetIdsAndDates();
+
+            var result = _validator.Validate(item);
 
             var entity = _context.Items.Add(item);
             _context.SaveChanges();
@@ -46,6 +51,9 @@ namespace TodoList.Services
         {
             var entity = _context.Items.FirstOrDefault(item => item.Id == itemId);
             entity.Update(item);
+
+            var result = _validator.Validate(entity);
+
             _context.SaveChanges();
 
             return _mapper.Map<ItemViewModel>(entity);
