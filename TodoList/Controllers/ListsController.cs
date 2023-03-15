@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using OneOf.Types;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using TodoList.Mappings;
 using TodoList.Services;
@@ -17,10 +19,13 @@ namespace TodoList.Controllers
         }
 
         [HttpGet("{listId}", Name = "GetListById")]
-        public ActionResult<ListViewModel> GetListById(Guid listId)
+        public IActionResult GetListById(Guid listId)
         {
-            var item = _service.GetById(listId);
-            return Ok(item);
+            var result = _service.GetById(listId);
+            return result.Match<IActionResult>(
+                list => Ok(list),
+                _ => NotFound()
+                );
         }
 
         [HttpPost()]
@@ -34,18 +39,24 @@ namespace TodoList.Controllers
         }
 
         [HttpPatch("{listId}")]
-        public ActionResult<ListViewModel> Update(Guid listId, [FromBody]UpdateListViewModel list)
+        public IActionResult Update(Guid listId, [FromBody]UpdateListViewModel list)
         {
-            var updatedList = _service.Update(listId, list);
-            return Ok(updatedList);
-
+            var result = _service.Update(listId, list);
+            return result.Match<IActionResult>(
+                list => Ok(list),
+                failed => BadRequest(failed.Errors.MapToResonse()),
+                _ => NotFound()
+            );
         }
 
         [HttpDelete("{listId}")]
-        public ActionResult<ListViewModel> Delete(Guid listId)
+        public IActionResult Delete(Guid listId)
         {
-            _service.Delete(listId);
-            return NoContent();
+            var result = _service.Delete(listId);
+            return result.Match<IActionResult>(
+                success => NoContent(),
+                _ => NotFound()
+                );
         }
     }
 }

@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
+using OneOf.Types;
 using TodoList.ModelExtensions;
 using TodoList.Models;
 using TodoList.Repository;
@@ -22,6 +23,19 @@ namespace TodoList.Services
             _mapper = mapper;
             _validator = validator;
         }
+        public OneOf<ListViewModel, NotFound> GetById(Guid listId)
+        {
+            var list =  _context.ItemsLists
+                .Include(list => list.Items)
+                .FirstOrDefault(list => list.Id == listId);
+
+            if (list == null)
+            {
+                return new NotFound();
+            }
+
+            return _mapper.Map<ListViewModel>(list);
+        }
 
         public OneOf<ListViewModel, ValidationFailed> Create(CreateListViewModel viewModel)
         {
@@ -40,33 +54,37 @@ namespace TodoList.Services
             return _mapper.Map<ListViewModel>(entity.Entity);
         }
 
-        public void Delete(Guid listId)
-        {
-            var list = new ItemsList { Id= listId };
-            _context.ItemsLists.Attach(list);
-            _context.ItemsLists.Remove(list);
-            _context.SaveChanges();
-        }
-
-        public ListViewModel GetById(Guid listId)
-        {
-            var list =  _context.ItemsLists
-                .Include(list => list.Items)
-                .FirstOrDefault(list => list.Id == listId)!;
-
-            return _mapper.Map<ListViewModel>(list);
-        }
-
-        public ListViewModel Update(Guid listId, UpdateListViewModel list)
+        public OneOf<ListViewModel, ValidationFailed, NotFound> Update(Guid listId, UpdateListViewModel list)
         {
             var entity = _context.ItemsLists.FirstOrDefault(list => list.Id == listId);
+            if (entity == null)
+            {
+                return new NotFound();
+            }
             entity.Update(list);
 
             var result = _validator.Validate(entity);
+            if (!result.IsValid)
+            {
+                return new ValidationFailed(result.Errors);
+            }
 
             _context.SaveChanges();
-
             return _mapper.Map<ListViewModel>(entity);
+        }
+
+        public OneOf<Success, NotFound> Delete(Guid listId)
+        {
+            var list = _context.ItemsLists.FirstOrDefault(list => list.Id == listId);
+
+            if (list == null)
+            {
+                return new NotFound();
+            }
+
+            _context.ItemsLists.Remove(list);
+            _context.SaveChanges();
+            return new Success();
         }
     }
 }
