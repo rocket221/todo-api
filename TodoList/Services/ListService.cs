@@ -37,6 +37,12 @@ namespace TodoList.Services
             return _mapper.Map<ListViewModel>(list);
         }
 
+        public List<ListViewModel> GetAllLists()
+        {
+            var lists = _context.ItemsLists.ToArray();
+            return _mapper.Map<ItemsList[], List<ListViewModel>>(lists);
+        }
+
         public OneOf<ListViewModel, ValidationFailed> Create(CreateListViewModel viewModel)
         {
             var list = _mapper.Map<ItemsList>(viewModel);

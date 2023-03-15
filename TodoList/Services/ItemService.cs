@@ -37,7 +37,8 @@ namespace TodoList.Services
 
         public List<ItemViewModel> GetAllItems()
         {
-            throw new NotImplementedException();
+            var items = _context.Items.ToArray();
+            return _mapper.Map<Item[], List<ItemViewModel>>(items);
         }
 
         public OneOf<ItemViewModel, ValidationFailed> Create(CreateItemViewModel viewModel)

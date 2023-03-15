@@ -28,6 +28,12 @@ namespace TodoList.Controllers
                 );
         }
 
+        [HttpGet]
+        public ActionResult<IEnumerable<ListViewModel>> GetAllLists()
+        {
+            return _service.GetAllLists();
+        }
+
         [HttpPost()]
         public IActionResult Create([FromBody] CreateListViewModel list)
         {
