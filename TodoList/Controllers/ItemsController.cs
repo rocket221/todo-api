@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TodoList.Mappings;
 using TodoList.Services;
 using TodoList.ViewModels;
 
@@ -15,31 +16,50 @@ namespace TodoList.Controllers
         }
 
         [HttpGet("{itemId}", Name = "GetItemById")]
-        public ActionResult<ItemViewModel> GetItemById(Guid itemId)
+        public IActionResult GetItemById(Guid itemId)
         {
-            var item = _service.GetById(itemId);
-            return Ok(item);
+            var result = _service.GetById(itemId);
+            return result.Match<IActionResult>(
+                item => Ok(item),
+                _ => NotFound()
+                );
+        }
+
+        [HttpGet]
+        public ActionResult<IEnumerable<ItemViewModel>> GetAllItems()
+        {
+            return _service.GetAllItems();
         }
 
         [HttpPost()]
-        public ActionResult<ItemViewModel> Create([FromBody]CreateItemViewModel item)
+        public IActionResult Create([FromBody]CreateItemViewModel item)
         {
-            var createdItem = _service.Create(item);
-            return CreatedAtRoute("GetItemById", new { itemId = createdItem.Id }, createdItem);
+            var result = _service.Create(item);
+            return result.Match<IActionResult>(
+                item => CreatedAtRoute("GetItemById", new { itemId = item.Id }, item),
+                failed => BadRequest(failed.Errors.MapToResonse())
+                );
         }
 
         [HttpPatch("{itemId}")]
-        public ActionResult<ItemViewModel> Update(Guid itemId, [FromBody]UpdateItemViewModel item)
+        public IActionResult Update(Guid itemId, [FromBody]UpdateItemViewModel item)
         {
-            var updatedItem = _service.Update(itemId, item);
-            return Ok(updatedItem);
+            var result = _service.Update(itemId, item);
+            return result.Match<IActionResult>(
+                item => Ok(item),
+                failed => BadRequest(failed.Errors.MapToResonse()),
+                _ => NotFound()
+            );
         }
 
         [HttpDelete("{itemId}")]
-        public ActionResult<ItemViewModel> Delete(Guid itemId)
+        public IActionResult Delete(Guid itemId)
         {
-            _service.Delete(itemId);
-            return NoContent();
+            var result = _service.Delete(itemId);
+            return result.Match<IActionResult>(
+                success => NoContent(),
+                _ => NotFound()
+                );
         }
     }
 }

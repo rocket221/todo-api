@@ -1,12 +1,16 @@
-﻿using TodoList.ViewModels;
+﻿using OneOf;
+using OneOf.Types;
+using TodoList.Validators;
+using TodoList.ViewModels;
 
 namespace TodoList.Services
 {
     public interface IListService
     {
-        ListViewModel GetById(Guid listId);
-        ListViewModel Create(CreateListViewModel list);
-        ListViewModel Update(Guid listId, UpdateListViewModel list);
-        void Delete(Guid listId);
+        OneOf<ListViewModel, NotFound> GetById(Guid listId);
+        List<ListViewModel> GetAllLists();
+        OneOf<ListViewModel, ValidationFailed> Create(CreateListViewModel list);
+        OneOf<ListViewModel, ValidationFailed, NotFound> Update(Guid listId, UpdateListViewModel list);
+        OneOf<Success, NotFound> Delete(Guid listId);
     }
 }
