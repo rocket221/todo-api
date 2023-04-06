@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TodoList.Mappings;
 using TodoList.Services;
 using TodoList.ViewModels;
@@ -26,8 +28,11 @@ namespace TodoList.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public ActionResult<IEnumerable<ItemViewModel>> GetAllItems()
         {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+
             return _service.GetAllItems();
         }
 

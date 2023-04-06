@@ -1,6 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 using TodoList.Repository;
+using TodoList.Services;
 using TodoList.Validators;
 
 namespace TodoList
@@ -23,10 +28,21 @@ namespace TodoList
                 });
             });
 
+            builder.Services.ConfigureOptions<JwtOptionsSetup>();
+            builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
             builder.Services.AddDbContext<TodoContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("TodoDatabase")));
+
+            builder.Services.AddTransient<IJwtProvider, JwtProvider>();
+
             builder.Services.RegisterServices();
             builder.Services.RegisterValidators();
             builder.Services.AddAutoMapper(typeof(Program));
+
+            builder.Services.AddAuthentication(opt => {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer();
 
             var app = builder.Build();
 
@@ -37,6 +53,7 @@ namespace TodoList
             }
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
             app.UseMiddleware<ExceptionMiddleware>();
