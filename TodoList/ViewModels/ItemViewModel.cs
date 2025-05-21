@@ -1,6 +1,4 @@
-﻿using TodoList.Models;
-
-namespace TodoList.ViewModels
+﻿namespace TodoList.ViewModels
 {
     public class ItemViewModel
     {

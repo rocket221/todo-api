@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 
-namespace TodoList
+namespace TodoList.Auth
 {
     public class JwtOptionsSetup : IConfigureOptions<JwtOptions>
     {

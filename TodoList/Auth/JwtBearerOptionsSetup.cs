@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace TodoList
+namespace TodoList.Auth
 {
     public class JwtBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
     {

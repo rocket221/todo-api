@@ -1,6 +1,6 @@
 ﻿using TodoList.ViewModels;
 
-namespace TodoList
+namespace TodoList.Auth
 {
     public interface IJwtProvider
     {

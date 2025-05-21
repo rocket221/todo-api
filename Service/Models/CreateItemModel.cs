@@ -1,6 +1,6 @@
-﻿namespace TodoList.ViewModels
+﻿namespace Service.Models
 {
-    public class CreateItemViewModel
+    public class CreateItemModel
     {
         public string? Title { get; set; }
         public string? Description { get; set; }

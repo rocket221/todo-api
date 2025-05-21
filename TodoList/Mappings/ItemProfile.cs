@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using TodoList.Models;
+using Domain.Models;
 using TodoList.ViewModels;
 
 namespace TodoList.Mappings

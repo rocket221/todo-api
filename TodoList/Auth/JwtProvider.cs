@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using TodoList.ViewModels;
 
-namespace TodoList
+namespace TodoList.Auth
 {
     public sealed class JwtProvider : IJwtProvider
     {

@@ -1,64 +1,95 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Domain.Models;
+using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Service.Models;
+using Service.Services;
 using System.Security.Claims;
 using TodoList.Mappings;
-using TodoList.Services;
 using TodoList.ViewModels;
 
 namespace TodoList.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ItemsController : ControllerBase
     {
         private readonly IItemService _service;
-        public ItemsController(IItemService service)
+        private readonly IMapper _mapper;
+        private readonly IValidator<CreateItemViewModel> _createValidator;
+        private readonly IValidator<UpdateItemViewModel> _updateValidator;
+
+        public ItemsController(
+            IItemService service,
+            IMapper mapper,
+            IValidator<CreateItemViewModel> createValidator,
+            IValidator<UpdateItemViewModel> updateValidator)
         {
             _service = service;
+            _mapper = mapper;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
         }
 
         [HttpGet("{itemId}", Name = "GetItemById")]
-        public IActionResult GetItemById(Guid itemId)
+        public IActionResult GetItemById(int itemId)
         {
             var result = _service.GetById(itemId);
             return result.Match<IActionResult>(
-                item => Ok(item),
+                item => Ok(_mapper.Map<ItemViewModel>(item)),
                 _ => NotFound()
                 );
         }
 
         [HttpGet]
-        [Authorize]
         public ActionResult<IEnumerable<ItemViewModel>> GetAllItems()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
 
-            return _service.GetAllItems();
+            var items = _service.GetAllItems();
+            return _mapper.Map<List<ItemViewModel>>(items);
         }
 
         [HttpPost()]
         public IActionResult Create([FromBody]CreateItemViewModel item)
         {
-            var result = _service.Create(item);
+            var validationResult = _createValidator.Validate(item);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.MapToResonse());
+            }
+
+            var createItemModel = _mapper.Map<CreateItemModel>(item);
+            var result = _service.Create(createItemModel);
+
             return result.Match<IActionResult>(
-                item => CreatedAtRoute("GetItemById", new { itemId = item.Id }, item),
-                failed => BadRequest(failed.Errors.MapToResonse())
+                item => CreatedAtRoute("GetItemById", new { itemId = item.Id }, item)
                 );
         }
 
         [HttpPatch("{itemId}")]
-        public IActionResult Update(Guid itemId, [FromBody]UpdateItemViewModel item)
+        public IActionResult Update(int itemId, [FromBody]UpdateItemViewModel item)
         {
-            var result = _service.Update(itemId, item);
+            var validationResult = _updateValidator.Validate(item);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.MapToResonse());
+            }
+
+            var updateItemModel = _mapper.Map<UpdateItemModel>(item);
+            var result = _service.Update(itemId, updateItemModel);
+
+
             return result.Match<IActionResult>(
                 item => Ok(item),
-                failed => BadRequest(failed.Errors.MapToResonse()),
                 _ => NotFound()
             );
         }
 
         [HttpDelete("{itemId}")]
-        public IActionResult Delete(Guid itemId)
+        public IActionResult Delete(int itemId)
         {
             var result = _service.Delete(itemId);
             return result.Match<IActionResult>(

@@ -1,14 +1,14 @@
-﻿using System.Runtime.CompilerServices;
-using TodoList.Services;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Service.Services;
 
-namespace TodoList
+namespace Service
 {
     public static class ServicesContainer
     {
         public static void RegisterServices(this IServiceCollection services)
         {
             services.AddTransient<IItemService, ItemService>();
-            services.AddTransient<IListService, ListService>();
+            services.AddTransient<ISheetService, SheetService>();
         }
     }
 }

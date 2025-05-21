@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TodoList.Auth;
 using TodoList.ViewModels;
 
 namespace TodoList.Controllers
@@ -14,6 +15,8 @@ namespace TodoList.Controllers
             _tokenProvider = tokenProvider;
         }
 
+
+        //quick and dirty login mock
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginCredentials loginCredentials)
         {
@@ -22,11 +25,9 @@ namespace TodoList.Controllers
                 return BadRequest("Invalid client request");
             }
 
-            //var user = _userService.GetUserByUsername(loginCredentials.Username);
-
             var user = new UserViewModel
             {
-                Id = Guid.NewGuid(),
+                Id = 1,
                 Email = "test@test.com"
             };
 
