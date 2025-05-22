@@ -33,7 +33,7 @@ namespace Service.Services
 
         public List<Sheet> GetAllSheets()
         {
-            var sheets = _context.Sheets.ToList();
+            var sheets = _context.Sheets.Include(x => x.Items).ToList();
             return sheets;
         }
 
@@ -62,6 +62,7 @@ namespace Service.Services
             return entity;
         }
 
+        //TODO validate this
         public OneOf<Success, NotFound> Delete(int sheetId)
         {
             var sheet = new Sheet { Id = sheetId };

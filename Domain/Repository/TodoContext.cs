@@ -16,12 +16,12 @@ namespace Domain.Repository
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Item>()
-                .ToTable("Item")
+                .ToTable("Items")
                 .HasOne(item => item.Sheet)
                 .WithMany(sheet => sheet.Items);
 
             modelBuilder.Entity<Sheet>()
-                .ToTable("Sheet")
+                .ToTable("Sheets")
                 .HasMany(sheet => sheet.Items)
                 .WithOne(item => item.Sheet)
                 .OnDelete(DeleteBehavior.Cascade);

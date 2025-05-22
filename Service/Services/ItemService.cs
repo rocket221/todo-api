@@ -4,21 +4,24 @@ using Domain.Repository;
 using Domain.Models;
 using Service.Models;
 using Service.ModelExtensions;
+using Service.Factories;
 
 namespace Service.Services
 {
     public class ItemService : IItemService
     {
         private readonly TodoContext _context;
+        private readonly IItemFactory _itemFactory;
 
-        public ItemService(TodoContext context)
+        public ItemService(TodoContext context, IItemFactory itemFactory)
         {
             _context = context;
+            _itemFactory = itemFactory;
         }
 
-        public OneOf<Item, NotFound> GetById(int itemId)
+        public OneOf<Item, NotFound> GetById(int itemId, int userId)
         {
-            var item = _context.Items.FirstOrDefault(item => item.Id == itemId);
+            var item = _context.Items.FirstOrDefault(i => i.Id == itemId && i.UserId == userId);
 
             if(item == null)
             {
@@ -28,28 +31,29 @@ namespace Service.Services
             return item;
         }
 
-        public List<Item> GetAllItems()
+        public List<Item> GetAllItems(int userId)
         {
-            var items = _context.Items.ToList();
+            var items = _context.Items.Where(x => x.UserId == userId).ToList();
             return items;
         }
 
-        public OneOf<Item> Create(CreateItemModel viewModel)
+        public OneOf<Item, NotFound> Create(int userId, CreateItemModel viewModel)
         {
-            throw new NotImplementedException();
+            var sheet = _context.Sheets.FirstOrDefault(s => s.Id == viewModel.SheetId && s.UserId == userId);
+            if (sheet == null)
+                return new NotFound();
 
-            //var item = _mapper.Map<Item>(viewModel);
-            //item.SetIdsAndDates();
+            var item = _itemFactory.Create(viewModel, userId);
 
-            //var entity = _context.Items.Add(item);
-            //_context.SaveChanges();
+            var entity = _context.Items.Add(item);
+            _context.SaveChanges();
 
-            //return entity.Entity;
+            return entity.Entity;
         }
 
-        public OneOf<Item, NotFound> Update(int itemId, UpdateItemModel item)
+        public OneOf<Item, NotFound> Update(int itemId, int userId, UpdateItemModel item)
         {
-            var entity = _context.Items.FirstOrDefault(item => item.Id == itemId);
+            var entity = _context.Items.FirstOrDefault(i => i.Id == itemId && i.UserId == userId);
             if (entity == null)
             {
                 return new NotFound();
@@ -59,9 +63,9 @@ namespace Service.Services
             _context.SaveChanges();
             return entity;
         }
-        public OneOf<Success, NotFound> Delete(int itemId)
+        public OneOf<Success, NotFound> Delete(int itemId, int userId)
         {
-            var item = _context.Items.FirstOrDefault(item => item.Id == itemId);
+            var item = _context.Items.FirstOrDefault(i => i.Id == itemId && i.UserId == userId);
             if (item == null)
             {
                 return new NotFound();

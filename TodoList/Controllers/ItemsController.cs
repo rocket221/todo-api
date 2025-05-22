@@ -1,20 +1,20 @@
 ﻿using AutoMapper;
-using Domain.Models;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Models;
 using Service.Services;
-using System.Security.Claims;
+using TodoList.Auth;
 using TodoList.Mappings;
 using TodoList.ViewModels;
 
 namespace TodoList.Controllers
 {
     [Authorize]
+    [RequireUserId]
     [ApiController]
     [Route("api/[controller]")]
-    public class ItemsController : ControllerBase
+    public class ItemsController : BaseController
     {
         private readonly IItemService _service;
         private readonly IMapper _mapper;
@@ -36,7 +36,7 @@ namespace TodoList.Controllers
         [HttpGet("{itemId}", Name = "GetItemById")]
         public IActionResult GetItemById(int itemId)
         {
-            var result = _service.GetById(itemId);
+            var result = _service.GetById(itemId, UserId!.Value);
             return result.Match<IActionResult>(
                 item => Ok(_mapper.Map<ItemViewModel>(item)),
                 _ => NotFound()
@@ -46,9 +46,7 @@ namespace TodoList.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<ItemViewModel>> GetAllItems()
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-            var items = _service.GetAllItems();
+            var items = _service.GetAllItems(UserId!.Value);
             return _mapper.Map<List<ItemViewModel>>(items);
         }
 
@@ -62,10 +60,11 @@ namespace TodoList.Controllers
             }
 
             var createItemModel = _mapper.Map<CreateItemModel>(item);
-            var result = _service.Create(createItemModel);
+            var result = _service.Create(UserId!.Value, createItemModel);
 
             return result.Match<IActionResult>(
-                item => CreatedAtRoute("GetItemById", new { itemId = item.Id }, item)
+                item => CreatedAtRoute("GetItemById", new { itemId = item.Id }, item),
+                _ => NotFound()
                 );
         }
 
@@ -79,7 +78,7 @@ namespace TodoList.Controllers
             }
 
             var updateItemModel = _mapper.Map<UpdateItemModel>(item);
-            var result = _service.Update(itemId, updateItemModel);
+            var result = _service.Update(itemId, UserId!.Value, updateItemModel);
 
 
             return result.Match<IActionResult>(
@@ -91,7 +90,7 @@ namespace TodoList.Controllers
         [HttpDelete("{itemId}")]
         public IActionResult Delete(int itemId)
         {
-            var result = _service.Delete(itemId);
+            var result = _service.Delete(itemId, UserId!.Value);
             return result.Match<IActionResult>(
                 success => NoContent(),
                 _ => NotFound()

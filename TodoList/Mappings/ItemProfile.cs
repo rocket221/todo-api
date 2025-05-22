@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Models;
+using Service.Models;
 using TodoList.ViewModels;
 
 namespace TodoList.Mappings
@@ -11,7 +12,7 @@ namespace TodoList.Mappings
             CreateMap<Item, ItemTitleViewModel>()
                 .ForMember(item => item.IsClosed, o => o.MapFrom(src => src.ClosedDate != null));
 
-            CreateMap<CreateItemViewModel, Item>();
+            CreateMap<CreateItemViewModel, CreateItemModel>();
 
             CreateMap<Item, ItemViewModel>();
         }

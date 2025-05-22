@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Service.Factories;
 using Service.Services;
 
 namespace Service
@@ -7,8 +8,10 @@ namespace Service
     {
         public static void RegisterServices(this IServiceCollection services)
         {
-            services.AddTransient<IItemService, ItemService>();
-            services.AddTransient<ISheetService, SheetService>();
+            services.AddScoped<IItemService, ItemService>();
+            services.AddScoped<ISheetService, SheetService>();
+            services.AddScoped<IItemFactory, ItemFactory>();
+            services.AddScoped<ISheetFactory, SheetFactory>();
         }
     }
 }
