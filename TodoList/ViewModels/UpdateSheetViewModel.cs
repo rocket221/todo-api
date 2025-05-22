@@ -1,9 +1,8 @@
 ﻿namespace TodoList.ViewModels
 {
-    public class CreateItemViewModel
+    public class UpdateSheetViewModel
     {
         public string? Title { get; set; }
         public string? Description { get; set; }
-        public int SheetId { get; set; }
     }
 }

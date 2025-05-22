@@ -19,6 +19,8 @@ namespace TodoList
 			}
 			catch (Exception ex)
 			{
+                //add logging
+
                 httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 httpContext.Response.ContentType= "application/json";
 

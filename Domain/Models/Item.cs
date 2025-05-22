@@ -1,6 +1,6 @@
-﻿namespace TodoList.ViewModels
+﻿namespace Domain.Models
 {
-    public class ItemViewModel
+    public class Item
     {
         public int Id { get; set; }
         public string? Title { get; set; }
@@ -9,5 +9,6 @@
         public int UserId { get; set; }
         public DateTime? ClosedDate { get; set; }
         public int SheetId { get; set; }
+        public Sheet? Sheet { get; set; }
     }
 }
