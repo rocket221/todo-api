@@ -1,9 +1,9 @@
-﻿using TodoList.ViewModels;
+﻿using TodoList.Dtos;
 
 namespace TodoList.Auth
 {
     public interface IJwtProvider
     {
-        string GenerateToken(UserViewModel user);
+        string GenerateToken(UserDto user);
     }
 }

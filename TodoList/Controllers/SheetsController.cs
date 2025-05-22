@@ -1,30 +1,31 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Service.Models;
 using Service.Services;
+using TodoList.Auth;
 using TodoList.Mappings;
-using TodoList.ViewModels;
+using TodoList.Dtos;
 
 namespace TodoList.Controllers
 {
     [Authorize]
+    [RequireUserId]
     [ApiController]
     [Route("api/[controller]")]
-    public class SheetsController : ControllerBase
+    public class SheetsController : BaseController
     {
         private readonly ISheetService _service;
         private readonly IMapper _mapper;
-        private readonly IValidator<CreateSheetViewModel> _createValidator;
-        private readonly IValidator<UpdateSheetViewModel> _updateValidator;
+        private readonly IValidator<CreateSheetDto> _createValidator;
+        private readonly IValidator<UpdateSheetDto> _updateValidator;
 
         public SheetsController(
             ISheetService service,
             IMapper mapper,
-            IValidator<CreateSheetViewModel> createValidator,
-            IValidator<UpdateSheetViewModel> updateValidator)
+            IValidator<CreateSheetDto> createValidator,
+            IValidator<UpdateSheetDto> updateValidator)
         {
             _service = service;
             _mapper = mapper;
@@ -35,22 +36,22 @@ namespace TodoList.Controllers
         [HttpGet("{sheetId}", Name = "GetSheetById")]
         public IActionResult GetSheetById(int sheetId)
         {
-            var result = _service.GetById(sheetId);
+            var result = _service.GetById(sheetId, UserId!.Value);
             return result.Match<IActionResult>(
-                sheet => Ok(_mapper.Map<SheetViewModel>(sheet)),
+                sheet => Ok(_mapper.Map<SheetDto>(sheet)),
                 _ => NotFound()
                 );
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<SheetViewModel>> GetAllSheets()
+        public ActionResult<IEnumerable<SheetDto>> GetAllSheets()
         {
-            var sheets = _service.GetAllSheets();
-            return _mapper.Map<List<SheetViewModel>>(sheets);
+            var sheets = _service.GetAllSheets(UserId!.Value);
+            return _mapper.Map<List<SheetDto>>(sheets);
         }
 
         [HttpPost()]
-        public IActionResult Create([FromBody] CreateSheetViewModel sheet)
+        public IActionResult Create([FromBody] CreateSheetDto sheet)
         {
             var validationResult = _createValidator.Validate(sheet);
             if (!validationResult.IsValid)
@@ -59,7 +60,7 @@ namespace TodoList.Controllers
             }
 
             var createSheetModel = _mapper.Map<CreateSheetModel>(sheet);
-            var result = _service.Create(createSheetModel);
+            var result = _service.Create(UserId!.Value, createSheetModel);
 
             return result.Match<IActionResult>(
                 sheet => CreatedAtRoute("GetSheetById", new { sheetId = sheet.Id }, sheet)
@@ -67,7 +68,7 @@ namespace TodoList.Controllers
         }
 
         [HttpPatch("{sheetId}")]
-        public IActionResult Update(int sheetId, [FromBody]UpdateSheetViewModel sheet)
+        public IActionResult Update(int sheetId, [FromBody]UpdateSheetDto sheet)
         {
             var validationResult = _updateValidator.Validate(sheet);
             if (!validationResult.IsValid)
@@ -77,7 +78,7 @@ namespace TodoList.Controllers
 
             var updateSheetModel = _mapper.Map<UpdateSheetModel>(sheet);
 
-            var result = _service.Update(sheetId, updateSheetModel);
+            var result = _service.Update(sheetId, UserId!.Value, updateSheetModel);
             return result.Match<IActionResult>(
                 sheet => Ok(sheet),
                 _ => NotFound()
@@ -87,7 +88,7 @@ namespace TodoList.Controllers
         [HttpDelete("{sheetId}")]
         public IActionResult Delete(int sheetId)
         {
-            var result = _service.Delete(sheetId);
+            var result = _service.Delete(sheetId, UserId!.Value);
             return result.Match<IActionResult>(
                 success => NoContent(),
                 _ => NotFound()

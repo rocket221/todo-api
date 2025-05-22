@@ -1,6 +1,6 @@
-﻿namespace TodoList.ViewModels
+﻿namespace TodoList.Dtos
 {
-    public class UserViewModel
+    public class UserDto
     {
         public int Id { get; set; }
         public required string Email { get; set; }

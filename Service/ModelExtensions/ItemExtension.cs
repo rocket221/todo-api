@@ -9,6 +9,7 @@ namespace Service.ModelExtensions
         {
             item.Title= updateItemModel.Title;
             item.Description = updateItemModel.Description;
+            item.ClosedDate = updateItemModel.ClosedDate;
         }
     }
 }

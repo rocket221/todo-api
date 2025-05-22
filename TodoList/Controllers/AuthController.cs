@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TodoList.Auth;
-using TodoList.ViewModels;
+using TodoList.Dtos;
 
 namespace TodoList.Controllers
 {
@@ -18,27 +18,22 @@ namespace TodoList.Controllers
 
         //quick and dirty login mock
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginCredentials loginCredentials)
+        public IActionResult Login([FromBody] CredentialsDto loginCredentials)
         {
             if (loginCredentials is null)
             {
                 return BadRequest("Invalid client request");
             }
 
-            var user = new UserViewModel
+            var user = new UserDto
             {
                 Id = 1,
                 Email = "test@test.com"
             };
 
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
-
             var token = _tokenProvider.GenerateToken(user);
 
-            return Ok(new AuthenticationViewModel { Token = token });
+            return Ok(new AuthenticationDto { Token = token });
         }
     }
 }

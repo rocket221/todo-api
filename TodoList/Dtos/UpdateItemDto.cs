@@ -1,8 +1,9 @@
-﻿namespace TodoList.ViewModels
+﻿namespace TodoList.Dtos
 {
-    public class UpdateItemViewModel
+    public class UpdateItemDto
     {
         public string? Title { get; set; }
         public string? Description { get; set; }
+        public DateTime? ClosedDate { get; set; }
     }
 }

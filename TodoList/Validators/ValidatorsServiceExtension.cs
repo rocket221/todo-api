@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using TodoList.ViewModels;
+using TodoList.Dtos;
+using TodoList.Dtos;
 
 namespace TodoList.Validators
 {
@@ -7,10 +8,10 @@ namespace TodoList.Validators
     {
         public static void RegisterValidators(this IServiceCollection services)
         {
-            services.AddScoped<IValidator<CreateItemViewModel>, CreateItemValidator>();
-            services.AddScoped<IValidator<UpdateItemViewModel>, UpdateItemValidator>();
-            services.AddScoped<IValidator<CreateSheetViewModel>, CreateSheetValidator>();
-            services.AddScoped<IValidator<UpdateSheetViewModel>, UpdateSheetValidator>();
+            services.AddScoped<IValidator<CreateItemDto>, CreateItemValidator>();
+            services.AddScoped<IValidator<UpdateItemDto>, UpdateItemValidator>();
+            services.AddScoped<IValidator<CreateSheetDto>, CreateSheetValidator>();
+            services.AddScoped<IValidator<UpdateSheetDto>, UpdateSheetValidator>();
         }
     }
 }

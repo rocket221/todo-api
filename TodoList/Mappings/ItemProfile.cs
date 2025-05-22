@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Domain.Models;
 using Service.Models;
-using TodoList.ViewModels;
+using TodoList.Dtos;
+using TodoList.Dtos;
 
 namespace TodoList.Mappings
 {
@@ -9,12 +10,14 @@ namespace TodoList.Mappings
     {
         public ItemProfile()
         {
-            CreateMap<Item, ItemTitleViewModel>()
+            CreateMap<Item, ItemTitleDto>()
                 .ForMember(item => item.IsClosed, o => o.MapFrom(src => src.ClosedDate != null));
 
-            CreateMap<CreateItemViewModel, CreateItemModel>();
+            CreateMap<CreateItemDto, CreateItemModel>();
 
-            CreateMap<Item, ItemViewModel>();
+            CreateMap<UpdateItemDto, UpdateItemModel>();
+
+            CreateMap<Item, ItemDto>();
         }
     }
 }
