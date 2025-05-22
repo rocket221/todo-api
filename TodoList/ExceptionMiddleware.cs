@@ -17,7 +17,7 @@ namespace TodoList
 			{
 				await _next(httpContext);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
                 //add logging
 

@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using TodoList.ViewModels;
+using TodoList.Dtos;
 
 namespace TodoList.Validators
 {
-    public class UpdateSheetValidator : AbstractValidator<UpdateSheetViewModel>
+    public class UpdateSheetValidator : AbstractValidator<UpdateSheetDto>
     {
         public UpdateSheetValidator()
         {

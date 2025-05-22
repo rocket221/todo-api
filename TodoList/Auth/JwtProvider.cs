@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using TodoList.ViewModels;
+using TodoList.Dtos;
 
 namespace TodoList.Auth
 {
@@ -16,7 +16,7 @@ namespace TodoList.Auth
             _options = jwtOptions.Value;
         }
 
-        public string GenerateToken(UserViewModel user)
+        public string GenerateToken(UserDto user)
         {
             var claims = new Claim[] 
             { 

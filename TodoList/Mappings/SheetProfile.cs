@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Models;
-using TodoList.ViewModels;
+using Service.Models;
+using TodoList.Dtos;
 
 namespace TodoList.Mappings
 {
@@ -8,9 +9,11 @@ namespace TodoList.Mappings
     {
         public SheetProfile()
         {
-            CreateMap<Sheet, SheetViewModel>();
+            CreateMap<Sheet, SheetDto>();
 
-            CreateMap<CreateSheetViewModel, Sheet>();
+            CreateMap<CreateSheetDto, CreateSheetModel>();
+
+            CreateMap<UpdateSheetDto, UpdateSheetModel>();
         }
     }
 }

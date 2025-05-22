@@ -1,13 +1,13 @@
 ﻿using FluentValidation.Results;
-using TodoList.ViewModels;
+using TodoList.Dtos;
 
 namespace TodoList.Mappings
 {
     public static class ValidationFailureMapping
     {
-        public static ValidationFailureViewModel MapToResonse(this IEnumerable<ValidationFailure> validationFailures)
+        public static ValidationFailureDto MapToResonse(this IEnumerable<ValidationFailure> validationFailures)
         {
-            return new ValidationFailureViewModel
+            return new ValidationFailureDto
             {
                 Errors = validationFailures.Select(x => new ValidationErrorViewModel
                 {

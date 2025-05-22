@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using TodoList.ViewModels;
+using TodoList.Dtos;
 
 namespace TodoList.Validators
 {
-    public class CreateItemValidator : AbstractValidator<CreateItemViewModel>
+    public class CreateItemValidator : AbstractValidator<CreateItemDto>
     {
         public CreateItemValidator()
         {

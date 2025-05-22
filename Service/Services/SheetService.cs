@@ -3,6 +3,7 @@ using Domain.Repository;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
+using Service.Factories;
 using Service.ModelExtensions;
 using Service.Models;
 
@@ -11,17 +12,19 @@ namespace Service.Services
     public class SheetService : ISheetService
     {
         private readonly TodoContext _context;
+        private readonly ISheetFactory _sheetFactory;
 
-        public SheetService(TodoContext context)
+        public SheetService(TodoContext context, ISheetFactory sheetFactory)
         {
             _context = context;
+            _sheetFactory = sheetFactory;
         }
 
-        public OneOf<Sheet, NotFound> GetById(int sheetId)
+        public OneOf<Sheet, NotFound> GetById(int sheetId, int userId)
         {
             var sheet =  _context.Sheets
-                .Include(sheet => sheet.Items)
-                .FirstOrDefault(sheet => sheet.Id == sheetId);
+                .Include(s => s.Items)
+                .FirstOrDefault(s => s.Id == sheetId && s.UserId == userId);
 
             if (sheet == null)
             {
@@ -31,27 +34,25 @@ namespace Service.Services
             return sheet;
         }
 
-        public List<Sheet> GetAllSheets()
+        public List<Sheet> GetAllSheets(int userId)
         {
-            var sheets = _context.Sheets.Include(x => x.Items).ToList();
+            var sheets = _context.Sheets.Include(x => x.Items).Where(s => s.UserId == userId).ToList();
             return sheets;
         }
 
-        public OneOf<Sheet> Create(CreateSheetModel createSheetModel)
+        public OneOf<Sheet> Create(int userId, CreateSheetModel createSheetModel)
         {
-            throw new NotImplementedException();
-            //var sheet = _mapper.Map<Sheet>(createSheetModel);
-            //sheet.SetIdsAndDates();
+            var item = _sheetFactory.Create(createSheetModel, userId);
 
-            //var entity = _context.Sheets.Add(sheet);
-            //_context.SaveChanges();
+            var entity = _context.Sheets.Add(item);
+            _context.SaveChanges();
 
-            //return entity.Entity;
+            return entity.Entity;
         }
 
-        public OneOf<Sheet, NotFound> Update(int sheetId, UpdateSheetModel sheet)
+        public OneOf<Sheet, NotFound> Update(int sheetId, int userId, UpdateSheetModel sheet)
         {
-            var entity = _context.Sheets.FirstOrDefault(sheet => sheet.Id == sheetId);
+            var entity = _context.Sheets.FirstOrDefault(s => s.Id == sheetId && s.UserId == userId);
             if (entity == null)
             {
                 return new NotFound();
@@ -62,16 +63,16 @@ namespace Service.Services
             return entity;
         }
 
-        //TODO validate this
-        public OneOf<Success, NotFound> Delete(int sheetId)
+        public OneOf<Success, NotFound> Delete(int sheetId, int userId)
         {
-            var sheet = new Sheet { Id = sheetId };
-            _context.Sheets.Attach(sheet);
-            _context.Sheets.Remove(sheet);
-
-            var changes = _context.SaveChanges();
-            if (changes == 0)
+            var sheet = _context.Sheets.FirstOrDefault(s => s.Id == sheetId && s.UserId == userId);
+            if (sheet == null)
+            {
                 return new NotFound();
+            }
+
+            _context.Sheets.Remove(sheet);
+            _context.SaveChanges();
             return new Success();
         }
     }

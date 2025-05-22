@@ -1,6 +1,6 @@
-﻿namespace TodoList.ViewModels
+﻿namespace TodoList.Dtos
 {
-    public class CreateItemViewModel
+    public class CreateItemDto
     {
         public string? Title { get; set; }
         public string? Description { get; set; }

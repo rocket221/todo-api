@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Service.Models;
 using Service.Services;
 using TodoList.Auth;
+using TodoList.Dtos;
 using TodoList.Mappings;
-using TodoList.ViewModels;
+using TodoList.Dtos;
 
 namespace TodoList.Controllers
 {
@@ -18,14 +19,14 @@ namespace TodoList.Controllers
     {
         private readonly IItemService _service;
         private readonly IMapper _mapper;
-        private readonly IValidator<CreateItemViewModel> _createValidator;
-        private readonly IValidator<UpdateItemViewModel> _updateValidator;
+        private readonly IValidator<CreateItemDto> _createValidator;
+        private readonly IValidator<UpdateItemDto> _updateValidator;
 
         public ItemsController(
             IItemService service,
             IMapper mapper,
-            IValidator<CreateItemViewModel> createValidator,
-            IValidator<UpdateItemViewModel> updateValidator)
+            IValidator<CreateItemDto> createValidator,
+            IValidator<UpdateItemDto> updateValidator)
         {
             _service = service;
             _mapper = mapper;
@@ -38,20 +39,20 @@ namespace TodoList.Controllers
         {
             var result = _service.GetById(itemId, UserId!.Value);
             return result.Match<IActionResult>(
-                item => Ok(_mapper.Map<ItemViewModel>(item)),
+                item => Ok(_mapper.Map<ItemDto>(item)),
                 _ => NotFound()
                 );
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ItemViewModel>> GetAllItems()
+        public ActionResult<IEnumerable<ItemDto>> GetAllItems()
         {
             var items = _service.GetAllItems(UserId!.Value);
-            return _mapper.Map<List<ItemViewModel>>(items);
+            return _mapper.Map<List<ItemDto>>(items);
         }
 
         [HttpPost()]
-        public IActionResult Create([FromBody]CreateItemViewModel item)
+        public IActionResult Create([FromBody] CreateItemDto item)
         {
             var validationResult = _createValidator.Validate(item);
             if (!validationResult.IsValid)
@@ -69,7 +70,7 @@ namespace TodoList.Controllers
         }
 
         [HttpPatch("{itemId}")]
-        public IActionResult Update(int itemId, [FromBody]UpdateItemViewModel item)
+        public IActionResult Update(int itemId, [FromBody] UpdateItemDto item)
         {
             var validationResult = _updateValidator.Validate(item);
             if (!validationResult.IsValid)
